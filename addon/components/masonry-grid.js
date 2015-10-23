@@ -1,11 +1,11 @@
 /* global imagesLoaded */
 import Ember from 'ember';
 
-var getOptions = function (keys) {
+var getOptions = function(keys) {
   var properties = this.getProperties(keys);
 
-  Object.keys(properties).forEach(function (key) {
-    if (properties[key] === "null") {
+  Object.keys(properties).forEach(function(key) {
+    if (properties[key] === 'null') {
       properties[key] = null;
     }
 
@@ -25,7 +25,7 @@ export default Ember.Component.extend({
 
   masonryInitialized: false,
 
-  initializeMasonry: Ember.on('didInsertElement', function () {
+  initializeMasonry: Ember.on('didInsertElement', function() {
     this.set('options', getOptions.call(this, [
       'containerStyle',
       'columnWidth',
@@ -37,19 +37,18 @@ export default Ember.Component.extend({
       'isOriginTop',
       'isResizeBound',
       'itemSelector',
-      'percentPosition',
       'stamp',
       'transitionDuration',
       'visibleStyle'
     ]));
 
-    this.layoutMasonry();
+    this.resetMasonry();
   }),
 
-  layoutMasonry: Ember.observer('items.[]', function () {
+  resetMasonry: Ember.observer('items', function() {
     var _this = this;
 
-    imagesLoaded(this.$(), function () {
+    imagesLoaded(this.$(), function() {
       if (_this.get('masonryInitialized')) {
         _this.$().masonry('destroy');
       }
@@ -57,5 +56,14 @@ export default Ember.Component.extend({
       _this.$().masonry(_this.get('options'));
       _this.set('masonryInitialized', true);
     });
-  })
+  }),
+
+  reloadMasonry: Ember.observer('items.@each', function() {
+    var _this = this;
+
+    imagesLoaded(this.$(), function() {
+      _this.$().masonry('reloadItems');
+      _this.$().masonry();
+    });
+  }),
 });
