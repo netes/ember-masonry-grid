@@ -8,7 +8,6 @@ var getOptions = function(keys) {
     if (properties[key] === 'null') {
       properties[key] = null;
     }
-
     if (properties[key] === undefined) {
       delete properties[key];
     }
@@ -48,14 +47,31 @@ export default Ember.Component.extend({
   resetMasonry: Ember.observer('items', function() {
     var _this = this;
 
-    imagesLoaded(this.$(), function() {
-      if (_this.get('masonryInitialized')) {
-        _this.$().masonry('destroy');
-      }
+    if (this.items && this.items.then) {
+      this.items.then(fulfill, reject);
+    } else {
+      fulfill();
+    }
 
-      _this.$().masonry(_this.get('options'));
-      _this.set('masonryInitialized', true);
-    });
+    function fulfill() {
+      imagesLoaded(_this.$(), function() {
+        if (_this.get('masonryInitialized') && _this.$()) {
+          _this.$().masonry('destroy');
+        }
+
+        if (_this.$()) {
+          _this.$().masonry(_this.get('options'));
+        }
+
+        if (!(_this.get('isDestroyed') || _this.get('isDestroying'))) {
+          _this.set('masonryInitialized', true);
+        }
+      });
+    }
+
+    function reject(reason) {
+      console.log(reason);
+    }
   }),
 
   reloadMasonry: Ember.observer('items.@each', function() {
