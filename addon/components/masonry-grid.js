@@ -75,7 +75,7 @@ export default Ember.Component.extend({
     }
   }),
 
-  reloadMasonry: Ember.observer('items.@each', function() {
+  reloadMasonry: Ember.observer('items.[]', function() {
     var _this = this;
 
     imagesLoaded(this.$(), function() {
